@@ -9,15 +9,18 @@ def main():
     api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
     load_dotenv()
     API_KEY = os.getenv('API_KEY')
-    USERNAME = os.getenv('USERNAME')
+    USERNAME = os.getenv('LASTFM_USERNAME')
+    
     # parameters to send to api
+    print (API_KEY)
+    print (USERNAME)
     parameters = {
         'method' : 'user.gettoptracks',
         'user' : USERNAME,
-        'api_key' : API_KEY,
+        'api_key' : API_KEY, # optional, apparently you don't need a key for this one
         'format' : 'json',
-        'limit' : 5,
-        'period' : '3month'
+        'limit' : 50,
+        'period' : '6months'
     }
 
     # get data from api
@@ -41,6 +44,8 @@ def main():
             print(track['name'])
     else:
         print('lastfm response data is malformed')
+
+    
 
 if __name__ == "__main__":
     main()
