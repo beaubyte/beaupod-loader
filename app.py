@@ -6,18 +6,21 @@ from yt_dlp import YoutubeDL # imports yt-dlp
 
 def main():
     print ('starting beaupod-loader')
+
+    # lastfm api configuration --------------
     api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
     load_dotenv()
-    API_KEY = os.getenv('API_KEY')
+    API_KEY = os.getenv('API_KEY') # not required for searching top songs, can be blank and still return data
     USERNAME = os.getenv('LASTFM_USERNAME')
+
+    # yt music api configuration --------------
+    yt = YTMusic() # this can be authenticated for more features, for now it does not need auth
     
-    # parameters to send to api
-    print (API_KEY)
-    print (USERNAME)
+    # parameters to send to lastfm api
     parameters = {
         'method' : 'user.gettoptracks',
         'user' : USERNAME,
-        'api_key' : API_KEY, # optional, apparently you don't need a key for this one
+        'api_key' : API_KEY,
         'format' : 'json',
         'limit' : 50,
         'period' : '6months'
@@ -45,7 +48,22 @@ def main():
     else:
         print('lastfm response data is malformed')
 
+    # query youtube music for songs
+    url_list = []
+    for idx in song_list:
+        results = yt.search(song_list[idx] + " " + artist_list[idx], filter='songs')
+        if results:
+            song = results[0]
+            song_id = song['videoId']
+            url = "https://music.youtube.com/watch?v=" + song_id
+            url_list.append(url)
+        else:
+            url_list.append("about:blank")
+
     
+
+
+
 
 if __name__ == "__main__":
     main()
