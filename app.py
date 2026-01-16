@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 import requests # imports requests for lastfm api
 from ytmusicapi import YTMusic # imports unofficial ytmusic api
-from yt_dlp import YoutubeDL # imports yt-dlp
+from yt_dlp import ytdlp # imports yt-dlp
+from mutagen.mp4 import MP4, MP4Cover
 
 def main():
     print ('starting beaupod-loader')
@@ -48,7 +49,7 @@ def main():
     else:
         print('lastfm response data is malformed')
 
-    # query youtube music for songs
+    # query youtube music for songs and append first result to list
     url_list = []
     for idx in song_list:
         results = yt.search(song_list[idx] + " " + artist_list[idx], filter='songs')
@@ -59,6 +60,12 @@ def main():
             url_list.append(url)
         else:
             url_list.append("about:blank")
+
+    # use yt-dlp to download song file and attach metadata
+    for url in url_list:
+        ytdlp.download(url)
+        
+
 
     
 
