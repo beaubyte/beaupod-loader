@@ -23,7 +23,7 @@ def main():
         'user' : USERNAME,
         'api_key' : API_KEY,
         'format' : 'json',
-        'limit' : 1,
+        'limit' : 5,
         'period' : '6months'
     }
 
@@ -37,14 +37,12 @@ def main():
         print ('lastfm api call failed with http status code: ' + str(response.status_code))
         exit(1)
         
-    # get artists and songs and build array
-    artist_list = []
+    # get lastfm song objects and build array
     song_list = []
     if ('toptracks' in response_data):
         for idx, track in enumerate(response_data['toptracks']['track'], 1):
-            artist_list.append(track['artist']['name'])
+            song_list.append(track)
             print("Added track: " + track['artist']['name'],end=' - ')
-            song_list.append(track['name'])
             print(track['name'])
     else:
         print('lastfm response data is malformed')
@@ -52,7 +50,7 @@ def main():
     # query youtube music for songs and append first result to list
     result_list = []
     for i in range(len(song_list)):
-        results = yt.search(song_list[i] + " " + artist_list[i], filter='songs')
+        results = yt.search(song_list[i]['name'] + " " + song_list[i]['artist']['name'], filter='songs')
         if results:
             song = results[0]
             result_list.append(song)
@@ -61,35 +59,33 @@ def main():
 
     # use yt-dlp to download song file and attach metadata
     for idx, result in enumerate(result_list):
+        # options passed to youtube-dlp
         ydl_opts = {
             'format': 'bestaudio/best',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'aac',
             }],
-            'outtmpl': str(song_list[idx] + " - " + artist_list[idx])
+            'outtmpl': str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'])
         }
         with YoutubeDL(ydl_opts) as ytdlp:
             song_id = result['videoId']
             url = "https://music.youtube.com/watch?v=" + song_id
             ytdlp.download(url)
-        audio_file = MP4(str(song_list[idx] + " - " + artist_list[idx] + ".m4a"))
+
+        # starts building metadata for the m4a file
+        audio_file = MP4(str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'] + ".m4a"))
         audio_file["\xa9nam"] = result["title"]
-        print(result["title"])
+        print('Attached title: ' + result["title"])
         audio_file["\xa9ART"] = result["artists"][0]["name"]
-        print(result["artists"][0]["name"])
+        print('Attached artist: ' + result["artists"][0]["name"])
         audio_file["\xa9alb"] = result["album"]["name"]
-        print(result["album"]["name"])
+        print('Attached album: ' + result["album"]["name"])
+        album_art = requests.get(song_list[idx]['image'][-1]['#text'])
+        if album_art.status_code == 200:
+            audio_file["covr"] = [MP4Cover(album_art.content, imageformat=MP4Cover.FORMAT_JPEG)]
         audio_file.save()
 
-
-
-        
-
-        
-
-
-    
 
 
 
