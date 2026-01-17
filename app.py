@@ -23,7 +23,7 @@ def main():
         'user' : USERNAME,
         'api_key' : API_KEY,
         'format' : 'json',
-        'limit' : 5,
+        'limit' : 1,
         'period' : 'overall'
     }
 
@@ -62,6 +62,7 @@ def main():
     for idx, result in enumerate(result_list):
         # options passed to youtube-dlp
         ydl_opts = {
+            'ffmpeg_location': './bin/ffmpeg',
             'format': 'bestaudio/best',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -69,7 +70,7 @@ def main():
             }],
             'postprocessor_args': [
                 '-ar', '44100', # resamples audio to the highest supported rate by 5th gen ipod
-                '-c:a', 'libfdk-aac' 
+                '-c:a', 'libfdk_aac' 
             ],
             'outtmpl': str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'])
         }
