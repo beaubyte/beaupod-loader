@@ -24,7 +24,7 @@ def main():
         'api_key' : API_KEY,
         'format' : 'json',
         'limit' : 5,
-        'period' : '6months'
+        'period' : 'overall'
     }
 
     # get data from api
@@ -54,6 +54,7 @@ def main():
         if results:
             song = results[0]
             result_list.append(song)
+            print('Found song: ' + song['title'] + ' - ' + song['artists'][0]['name'])
         else:
             result_list.append("error")
 
@@ -66,6 +67,10 @@ def main():
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'aac',
             }],
+            'postprocessor_args': [
+                '-ar', '44100', # resamples audio to the highest supported rate by 5th gen ipod
+                '-c:a', 'libfdk-aac' 
+            ],
             'outtmpl': str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'])
         }
         with YoutubeDL(ydl_opts) as ytdlp:
