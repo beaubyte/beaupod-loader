@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 import requests # imports requests for lastfm api
 from ytmusicapi import YTMusic # imports unofficial ytmusic api
-from yt_dlp import ytdlp # imports yt-dlp
+from yt_dlp import YoutubeDL
 from mutagen.mp4 import MP4, MP4Cover
 
 def main():
@@ -23,7 +23,7 @@ def main():
         'user' : USERNAME,
         'api_key' : API_KEY,
         'format' : 'json',
-        'limit' : 50,
+        'limit' : 1,
         'period' : '6months'
     }
 
@@ -50,20 +50,42 @@ def main():
         print('lastfm response data is malformed')
 
     # query youtube music for songs and append first result to list
-    url_list = []
-    for idx in song_list:
-        results = yt.search(song_list[idx] + " " + artist_list[idx], filter='songs')
+    result_list = []
+    for i in range(len(song_list)):
+        results = yt.search(song_list[i] + " " + artist_list[i], filter='songs')
         if results:
             song = results[0]
-            song_id = song['videoId']
-            url = "https://music.youtube.com/watch?v=" + song_id
-            url_list.append(url)
+            result_list.append(song)
         else:
-            url_list.append("about:blank")
+            result_list.append("error")
 
     # use yt-dlp to download song file and attach metadata
-    for url in url_list:
-        ytdlp.download(url)
+    for idx, result in enumerate(result_list):
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'aac',
+            }],
+            'outtmpl': str(song_list[idx] + " - " + artist_list[idx])
+        }
+        with YoutubeDL(ydl_opts) as ytdlp:
+            song_id = result['videoId']
+            url = "https://music.youtube.com/watch?v=" + song_id
+            ytdlp.download(url)
+        audio_file = MP4(str(song_list[idx] + " - " + artist_list[idx] + ".m4a"))
+        audio_file["\xa9nam"] = result["title"]
+        print(result["title"])
+        audio_file["\xa9ART"] = result["artists"][0]["name"]
+        print(result["artists"][0]["name"])
+        audio_file["\xa9alb"] = result["album"]["name"]
+        print(result["album"]["name"])
+        audio_file.save()
+
+
+
+        
+
         
 
 
