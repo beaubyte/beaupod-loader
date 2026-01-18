@@ -1,6 +1,6 @@
 # beaupod-loader
 
-A script I made to get top songs from my Last.FM or from YouTube Music playlists/radios, attach metadata, and then download via yt-dlp to an .M4A file for loading onto my iPod. No API keys are required for Last.FM top-tracks functionality, but may be required for specific YouTube Music requests.
+A script I made to get top songs from my Last.FM or from YouTube Music playlists/radios, attach metadata, and then download via yt-dlp to an .M4A file for loading onto my iPod. At the current moment, a .env file must be provided with a **API_KEY** (for Last.FM) and a **USERNAME** value.
 
 ### Dependancies
 
