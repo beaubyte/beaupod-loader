@@ -11,8 +11,13 @@ def main():
     # lastfm api configuration --------------
     api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
     load_dotenv()
-    API_KEY = os.getenv('API_KEY') # not required for searching top songs, can be blank and still return data
-    USERNAME = os.getenv('LASTFM_USERNAME')
+    API_KEY = os.getenv('API_KEY') # required actually i think, put in .env file
+    print('lastfm username:')
+    USERNAME = input()
+    print('amount of top tracks to retrieve')
+    num_songs = input()
+    print('time period of top track to retrieve (1month | 3month | 6month | 12month | overall)') # make this a 1-5 input later
+    time_period = input()
 
     # yt music api configuration --------------
     yt = YTMusic() # this can be authenticated for more features, for now it does not need auth
@@ -23,8 +28,8 @@ def main():
         'user' : USERNAME,
         'api_key' : API_KEY,
         'format' : 'json',
-        'limit' : 1,
-        'period' : 'overall'
+        'limit' : num_songs,
+        'period' : time_period
     }
 
     # get data from api
@@ -46,6 +51,7 @@ def main():
             print(track['name'])
     else:
         print('lastfm response data is malformed')
+        exit(2)
 
     # query youtube music for songs and append first result to list
     result_list = []
