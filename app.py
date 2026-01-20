@@ -78,7 +78,7 @@ def main():
                 '-ar', '44100', # resamples audio to the highest supported rate by 5th gen ipod
                 '-c:a', 'libfdk_aac' 
             ],
-            'outtmpl': str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'])
+            'outtmpl': 'songs/' + str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'])
         }
         with YoutubeDL(ydl_opts) as ytdlp:
             song_id = result['videoId']
@@ -86,7 +86,7 @@ def main():
             ytdlp.download(url)
 
         # starts building metadata for the m4a file
-        audio_file = MP4(str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'] + ".m4a"))
+        audio_file = MP4('songs/' + str(song_list[idx]['name'] + " - " + song_list[idx]['artist']['name'] + ".m4a"))
         audio_file["\xa9nam"] = result["title"]
         print('Attached title: ' + result["title"])
         audio_file["\xa9ART"] = result["artists"][0]["name"]
