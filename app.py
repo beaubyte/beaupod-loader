@@ -12,6 +12,7 @@ def main():
     api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
     load_dotenv()
     API_KEY = os.getenv('API_KEY') # required actually i think, put in .env file
+    print ('Welcome to BeauPod Loader!')
     print('lastfm username:')
     USERNAME = input()
     print('amount of top tracks to retrieve')
