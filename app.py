@@ -8,51 +8,26 @@ from mutagen.mp4 import MP4, MP4Cover
 def main():
     print ('starting beaupod-loader')
 
-    # lastfm api configuration --------------
-    api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
     load_dotenv()
     API_KEY = os.getenv('API_KEY') # required actually i think, put in .env file
     print ('Welcome to BeauPod Loader!')
-    print('lastfm username:')
-    USERNAME = input()
-    print('amount of top tracks to retrieve')
-    num_songs = input()
-    print('time period of top track to retrieve (1month | 3month | 6month | 12month | overall)') # make this a 1-5 input later
-    time_period = input()
+    print ('Options:\n1. Load top tracks from LastFM')
+    choice_int = input()
+    match choice_int:
+        case '1':
+            print('lastfm username:')
+            USERNAME = input()
+            print('amount of top tracks to retrieve')
+            num_songs = input()
+            print('time period of top track to retrieve (1month | 3month | 6month | 12month | overall)') # make this a 1-5 input later
+            time_period = input()
+            song_list = get_top_tracks_lastfm(USERNAME, API_KEY, time_period, num_songs)
+        case _:
+            print('please select a valid option')
+            exit(0)
 
     # yt music api configuration --------------
     yt = YTMusic() # this can be authenticated for more features, for now it does not need auth
-    
-    # parameters to send to lastfm api
-    parameters = {
-        'method' : 'user.gettoptracks',
-        'user' : USERNAME,
-        'api_key' : API_KEY,
-        'format' : 'json',
-        'limit' : num_songs,
-        'period' : time_period
-    }
-
-    # get data from api
-    response = requests.get(api_endpoint, parameters)
-
-    if (response.status_code == 200):
-        response_data = response.json()
-        print ('api request succeeded')
-    else:
-        print ('lastfm api call failed with http status code: ' + str(response.status_code))
-        exit(1)
-        
-    # get lastfm song objects and build array
-    song_list = []
-    if ('toptracks' in response_data):
-        for idx, track in enumerate(response_data['toptracks']['track'], 1):
-            song_list.append(track)
-            print("Added track: " + track['artist']['name'],end=' - ')
-            print(track['name'])
-    else:
-        print('lastfm response data is malformed')
-        exit(2)
 
     # query youtube music for songs and append first result to list
     result_list = []
@@ -99,9 +74,40 @@ def main():
             audio_file["covr"] = [MP4Cover(album_art.content, imageformat=MP4Cover.FORMAT_JPEG)]
         audio_file.save()
 
+def get_top_tracks_lastfm(USERNAME, API_KEY, time_period, num_songs):
+    # parameters to send to lastfm api
+    api_endpoint = 'http://ws.audioscrobbler.com/2.0/'
 
+    parameters = {
+        'method' : 'user.gettoptracks',
+        'user' : USERNAME,
+        'api_key' : API_KEY,
+        'format' : 'json',
+        'limit' : num_songs,
+        'period' : time_period
+    }
 
+    # get data from api
+    response = requests.get(api_endpoint, parameters)
 
+    if (response.status_code == 200):
+        response_data = response.json()
+        print ('api request succeeded')
+    else:
+        print ('lastfm api call failed with http status code: ' + str(response.status_code))
+        exit(1)
+        
+    # get lastfm song objects and build array
+    song_list = []
+    if ('toptracks' in response_data):
+        for idx, track in enumerate(response_data['toptracks']['track'], 1):
+            song_list.append(track)
+            print("Added track: " + track['artist']['name'],end=' - ')
+            print(track['name'])
+    else:
+        print('lastfm response data is malformed')
+        exit(2)
+    return song_list
 
 if __name__ == "__main__":
     main()
