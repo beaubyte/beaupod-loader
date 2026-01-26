@@ -31,4 +31,4 @@ PATH="$PROJECT_DIR/bin:$PATH" make && \
 make install && \
 hash -r
 
-echo "Success: Compiled FFmpeg has been installed to: $PROJECT_DIR/bin/ffmpeg"
+echo "Script Finished: Compiled FFmpeg should be installed to: $PROJECT_DIR/bin/ffmpeg"
