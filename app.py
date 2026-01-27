@@ -11,13 +11,13 @@ def main():
     load_dotenv()
     API_KEY = os.getenv('API_KEY') # required actually i think, put in .env file
     print ('Welcome to BeauPod Loader!')
-    print ('Options:\n1. Load top tracks from LastFM')
+    print ('Options:\n1: Load top tracks from LastFM\n2: Load playlist from YouTube Music')
     choice_int = input()
     match choice_int:
         case '1':
             print('lastfm username:')
             USERNAME = input()
-            print('amount of top tracks to retrieve')
+            print('amount of tracks to retrieve')
             num_songs = input()
             print('time period of top track to retrieve (1month | 3month | 6month | 12month | overall)') # make this a 1-5 input later
             time_period = input()
